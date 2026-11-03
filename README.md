@@ -42,6 +42,7 @@ Prérequis : un broker MQTT (ex. application Mosquitto) et une passerelle RS485 
 | `period` | Période de rafraîchissement (s) |
 | `enable_circuit_a` / `_b` / `_c` | Force la publication des circuits A, B, C |
 | `mqtt_discovery_enable`, `discovery_prefix` | Découverte automatique dans Home Assistant |
+| `log_level` | Niveau de log : `INFO` par défaut, `DEBUG` pour voir chaque trame ModBus envoyée et reçue (très verbeux) |
 
 ## Circuit C (Diematic 3)
 
@@ -83,6 +84,7 @@ Home Assistant app (add-on) bridging a **De Dietrich boiler with a Diematic 3 co
 - Packaging as a **Home Assistant app**, configured from the UI.
 - **Circuit C support**: mode, day/night/anti-frost setpoints, calculated and departure temperatures, pump (`enable_circuit_c` option). See the register table above.
 - **Automatic reconnection**: when the ModBus gateway is unreachable, the app retries every 30 s instead of stopping.
+- **`log_level` option**: set it to `DEBUG` to log every ModBus frame sent and received (very verbose; `INFO` by default).
 
 **Install:** Settings → Apps → App store → ⋮ → Repositories → add this repository URL → install *Diematic to MQTT* → configure → start.
 

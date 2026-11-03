@@ -42,3 +42,11 @@ os.makedirs("/app/log", exist_ok=True)
 
 with open("/app/conf/Diematic32MQTT.conf", "w") as f:
     f.write(conf)
+
+# Niveau de log choisi dans les options (DEBUG affiche les trames ModBus)
+log_level = o.get('log_level', 'INFO')
+with open("/app/conf/logging.conf") as f:
+    logging_conf = f.read()
+logging_conf = logging_conf.replace("[logger_root]\nlevel=INFO", f"[logger_root]\nlevel={log_level}")
+with open("/app/conf/logging.conf", "w") as f:
+    f.write(logging_conf)

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0
+
+- New option `log_level` (`DEBUG`, `INFO`, `WARNING`, `ERROR`; default `INFO`). `DEBUG` logs every ModBus frame sent and received.
+
 ## 1.1.0
 
 - Circuit C support (Diematic 3): mode, day/night/anti-frost setpoints, calculated temperature, departure temperature, pump. New option `enable_circuit_c`.
