@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.1
+
+- Home Assistant discovery messages are now also sent when the app connects to the MQTT broker, not only on the Home Assistant birth message. New entities now appear right after an app update, without restarting Home Assistant or the MQTT broker. Reported in #3.
+
 ## 1.3.0
 
 - Circuit B (Diematic 3): new topics `zoneB/targetTemp` (calculated flow temperature, register 32) and `zoneB/departureTemp` (measured flow temperature, register 33), with Home Assistant discovery sensors "Température Calculée Zone B" and "Température Départ Zone B" (°C). Requested in #3.

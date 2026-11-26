@@ -126,7 +126,11 @@ def diematicPublish(self):
 	buffer.send();
 
 def haSendDiscoveryMessages(client, userdata, message):
+	#Home Assistant birth message
 	if (message.payload.decode()=='online'):
+		sendDiscoveryMessages();
+
+def sendDiscoveryMessages():
 		logger.info('Sending HA discovery messages');
 		
 		#boiler
@@ -198,6 +202,8 @@ def on_connect(client, userdata, flags, reason_code, properties=None):
 	client.subscribe(mqttTopicPrefix+'/date/set',2);
 	if hassioDiscoveryEnable:
 		client.subscribe(hassioDiscoveryPrefix+'/status',2);
+		#announce entities on (re)connection too, so that new sensors appear after an app update without restarting Home Assistant or the broker
+		sendDiscoveryMessages();
 	#clear buffer and inform client that status is still Offline
 	buffer.clear();
 	buffer.update('status','Offline');
