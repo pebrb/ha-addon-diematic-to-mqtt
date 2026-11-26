@@ -37,6 +37,7 @@ class DDREGISTER(IntEnum):
 	MODE_B=26;
 	TEMP_AMB_B=27;
 	TCALC_B=32;
+	TEMP_DEP_B=33;
 	CONS_JOUR_C=35;
 	CONS_NUIT_C=36;
 	CONS_ANTIGEL_C=37;
@@ -168,6 +169,8 @@ class Diematic:
 		self._zoneBDayTargetTemp=None;
 		self._zoneBNightTargetTemp=None;
 		self._zoneBAntiiceTargetTemp=None;
+		self.zoneBTargetTemp=None;
+		self.zoneBDepartureTemp=None;
 		self.zoneCTemp=None;
 		self._zoneCMode=None;
 		self.zoneCPump=None;
@@ -539,6 +542,8 @@ class Diematic:
 				self._zoneBMode='ANTIGEL';
 				
 			self.zoneBPump=(self.registers[DDREGISTER.OPTIONS_B_C] & 0x10) >>4;
+			self.zoneBTargetTemp=self.float10(self.registers[DDREGISTER.TCALC_B]);
+			self.zoneBDepartureTemp=self.float10(self.registers[DDREGISTER.TEMP_DEP_B]);
 			self._zoneBDayTargetTemp=self.float10(self.registers[DDREGISTER.CONS_JOUR_B]);
 			self._zoneBNightTargetTemp=self.float10(self.registers[DDREGISTER.CONS_NUIT_B]);
 			self._zoneBAntiiceTargetTemp=self.float10(self.registers[DDREGISTER.CONS_ANTIGEL_B]);
@@ -546,6 +551,8 @@ class Diematic:
 		else:
 			self._zoneBMode=None;
 			self.zoneBPump=None;
+			self.zoneBTargetTemp=None;
+			self.zoneBDepartureTemp=None;
 			self._zoneBDayTargetTemp=None;
 			self._zoneBNightTargetTemp=None;
 			self._zoneBAntiiceTargetTemp=None;

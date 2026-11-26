@@ -19,6 +19,8 @@ La table des registres du circuit C provient de la documentation publique Sofrel
 |---|---|
 | **Application Home Assistant** | Installation depuis la boutique d'applications, toute la configuration dans l'onglet *Configuration* (plus de fichier `.conf` à éditer). |
 | **Prise en charge du circuit C** | Mode (AUTO, TEMP/PERM JOUR, TEMP/PERM NUIT, ANTIGEL), consignes jour/nuit/antigel, température calculée, température de départ, pompe C. Option `enable_circuit_c`. |
+| **Températures du circuit B** | Température calculée (registre 32) et température de départ (registre 33) du circuit B, comme pour le circuit C (demande #3). |
+| **Registres bruts (option)** | `mqtt_publish_raw_registers` publie tous les registres déjà lus en JSON brut, pour le diagnostic. |
 | **Reconnexion automatique** | Si la passerelle ModBus est injoignable (coupure WiFi, redémarrage), l'application attend et réessaie toutes les 30 s au lieu de s'arrêter. |
 
 ## Installation
@@ -43,6 +45,17 @@ Prérequis : un broker MQTT (ex. application Mosquitto) et une passerelle RS485 
 | `enable_circuit_a` / `_b` / `_c` | Force la publication des circuits A, B, C |
 | `mqtt_discovery_enable`, `discovery_prefix` | Découverte automatique dans Home Assistant |
 | `log_level` | Niveau de log : `INFO` par défaut, `DEBUG` pour voir chaque trame ModBus envoyée et reçue (très verbeux) |
+| `mqtt_publish_raw_registers` | `false` par défaut. Si activé, publie tous les registres lus (1-127, 384-470 en Diematic 3) en un seul JSON sur `<topic_prefix>/<client_id>/raw/registers` : valeurs 16 bits brutes, sans unité ni échelle (`65535` = `0xFFFF` = non disponible), lecture seule, retenu, envoyé seulement si une valeur change, aucune entité Home Assistant créée |
+
+## Circuit B (Diematic 3) : températures
+
+| Donnée | Registre | Topic MQTT (`<prefix>/<client_id>/...`) |
+|---|---|---|
+| Température ambiance (sonde d'ambiance B) | 27 | `zoneB/temp` |
+| Température calculée | 32 | `zoneB/targetTemp` |
+| Température départ | 33 | `zoneB/departureTemp` |
+
+Publiées quand le circuit B est détecté (sonde d'ambiance) ou forcé par `enable_circuit_b`. La température de retour de la chaudière est publiée sur `returnTemp` (registre 453).
 
 ## Circuit C (Diematic 3)
 
@@ -84,6 +97,8 @@ Home Assistant app (add-on) bridging a **De Dietrich boiler with a Diematic 3 co
 - Packaging as a **Home Assistant app**, configured from the UI.
 - **Circuit C support**: mode, day/night/anti-frost setpoints, calculated and departure temperatures, pump (`enable_circuit_c` option). See the register table above.
 - **Automatic reconnection**: when the ModBus gateway is unreachable, the app retries every 30 s instead of stopping.
+- **Circuit B temperatures**: calculated (register 32, `zoneB/targetTemp`) and measured flow temperature (register 33, `zoneB/departureTemp`), with discovery sensors. Boiler return temperature is on `returnTemp` (register 453).
+- **`mqtt_publish_raw_registers` option** (default `false`): publishes every register already read as one raw JSON object on `<topic_prefix>/<client_id>/raw/registers` (read-only, 16-bit values without scaling, `65535` = not available, retained, sent only on change, no HA entities).
 - **`log_level` option**: set it to `DEBUG` to log every ModBus frame sent and received (very verbose; `INFO` by default).
 
 **Install:** Settings → Apps → App store → ⋮ → Repositories → add this repository URL → install *Diematic to MQTT* → configure → start.

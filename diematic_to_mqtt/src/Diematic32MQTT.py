@@ -41,7 +41,11 @@ class MessageBuffer:
 					#send message without trailing / on topic
 					if (topic!=''):
 						self.mqtt.publish(mqttTopicPrefix+'/'+topic,self.buffer[topic]['value'],1,True);
-						self.logger.info('Publish :'+mqttTopicPrefix+'/'+topic+' '+self.buffer[topic]['value'])
+						#raw register snapshot is large and frequent: log it in DEBUG only
+						if topic.startswith('raw/'):
+							self.logger.debug('Publish :'+mqttTopicPrefix+'/'+topic+' '+self.buffer[topic]['value'])
+						else:
+							self.logger.info('Publish :'+mqttTopicPrefix+'/'+topic+' '+self.buffer[topic]['value'])
 					else:
 						self.mqtt.publish(mqttTopicPrefix,self.buffer[topic]['value'],1,True);
 						self.logger.info('Publish :'+mqttTopicPrefix+' '+self.buffer[topic]['value'])
@@ -98,6 +102,8 @@ def diematicPublish(self):
 	buffer.update('zoneB/temp',floatValue(self.zoneBTemp));
 	buffer.update('zoneB/mode',self.zoneBMode if self.zoneBMode is not None else '');
 	buffer.update('zoneB/pump',intValue(self.zoneBPump));
+	buffer.update('zoneB/targetTemp',floatValue(self.zoneBTargetTemp));
+	buffer.update('zoneB/departureTemp',floatValue(self.zoneBDepartureTemp));
 	buffer.update('zoneB/dayTemp',floatValue(self.zoneBDayTargetTemp));
 	buffer.update('zoneB/nightTemp',floatValue(self.zoneBNightTargetTemp));
 	buffer.update('zoneB/antiiceTemp',floatValue(self.zoneBAntiiceTargetTemp));
@@ -111,6 +117,10 @@ def diematicPublish(self):
 	buffer.update('zoneC/dayTemp',floatValue(self.zoneCDayTargetTemp));
 	buffer.update('zoneC/nightTemp',floatValue(self.zoneCNightTargetTemp));
 	buffer.update('zoneC/antiiceTemp',floatValue(self.zoneCAntiiceTargetTemp));
+
+	#optional raw register snapshot (read-only, values as read from the regulator, no scaling; 65535 = 0xFFFF = not available)
+	if publishRawRegisters:
+		buffer.update('raw/registers',json.dumps({str(k):v for k,v in sorted(self.registers.items())},separators=(',',':')) if self.availability else '');
 
 	#send MQTT messages
 	buffer.send();
@@ -162,6 +172,8 @@ def haSendDiscoveryMessages(client, userdata, message):
 		hassio.addSelect('zone_B_mode',"Mode Zone B",'zoneB/mode','zoneB/mode/set',['AUTO','TEMP JOUR','PERM JOUR','TEMP NUIT','PERM NUIT','ANTIGEL']);
 		hassio.addSensor('zone_B_mode',"Mode Zone B",None,'zoneB/mode',None,None);
 		hassio.addBinarySensor('zone_B_pump',"Pompe Zone B",None,'zoneB/pump',"1","0");
+		hassio.addSensor('zone_B_target_temp',"Température Calculée Zone B",'temperature','zoneB/targetTemp',None,"°C");
+		hassio.addSensor('zone_B_departure_temp',"Température Départ Zone B",'temperature','zoneB/departureTemp',None,"°C");
 		hassio.addNumber('zone_B_temp_day',"Température Jour Zone B",'zoneB/dayTemp','zoneB/dayTemp/set',5,30,0.5,"°C");
 		hassio.addNumber('zone_B_temp_night',"Température Nuit Zone B",'zoneB/nightTemp','zoneB/nightTemp/set',5,30,0.5,"°C");
 		hassio.addNumber('zone_B_temp_antiice',"Température Antigel Zone B",'zoneB/antiiceTemp','zoneB/antiiceTemp/set',5,20,0.5,"°C");
@@ -328,6 +340,10 @@ if __name__ == '__main__':
 		
 		logger.critical('Hassio Discovery Enable: '+ str(hassioDiscoveryEnable));
 		logger.critical('Hassio Discovery Prefix: '+ hassioDiscoveryPrefix);
+
+		#optional raw register publication
+		publishRawRegisters=config.getboolean('MQTT','publishRawRegisters',fallback=False);
+		logger.critical('Publish raw registers: '+ str(publishRawRegisters));
 		
 
 		#init panel

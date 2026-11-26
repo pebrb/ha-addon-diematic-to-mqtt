@@ -22,6 +22,7 @@ brokerLogin: {o.get('mqtt_broker_login', '')}
 brokerPassword: {o.get('mqtt_broker_password', '')}
 topicPrefix: {o.get('topic_prefix', 'home/heater')}
 clientId: {o.get('client_id', 'boiler')}
+publishRawRegisters: {b2s(o.get('mqtt_publish_raw_registers', False))}
 
 [Boiler]
 regulatorType:{o.get('regulator_type', 'Diematic3')}
