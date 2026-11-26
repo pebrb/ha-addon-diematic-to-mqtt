@@ -82,8 +82,6 @@ Lors de l'écriture du mode, les bits eau chaude sanitaire du registre 38 sont p
 
 MIT – © 2021 Benoit3 (projet d'origine). Les modifications de ce dépôt sont publiées sous la même licence.
 
-Les évolutions de ce dépôt ont été développées avec l'aide de Claude (Anthropic).
-
 ---
 
 <a name="english"></a>
@@ -104,5 +102,3 @@ Home Assistant app (add-on) bridging a **De Dietrich boiler with a Diematic 3 co
 **Install:** Settings → Apps → App store → ⋮ → Repositories → add this repository URL → install *Diematic to MQTT* → configure → start.
 
 **Warning:** only tested on a De Dietrich MC45 with Diematic III (circuit C = radiators, B = pool heat exchanger, A absent) and a USR-W610 gateway. Check your boiler's installer menus (CIRC. A/B/C) before enabling a circuit or writing a mode. Provided "as is", without warranty.
-
-Changes in this repository were developed with the help of Claude (Anthropic).
